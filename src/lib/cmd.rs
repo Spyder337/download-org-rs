@@ -32,9 +32,6 @@ pub(crate) fn execute(organizer: &mut Organizer) -> (){
             None => organizer.display_rules(),
         },
         Some(Commands::Save) => organizer.save_file(),
-        Some(Commands::Load) => {
-            *organizer = organizer::load_organizer();
-        }
         None => (),
     }
 }
@@ -79,7 +76,7 @@ enum Commands {
         #[arg(short = 'a', long, help = "Assigns a new path to be sorted.")]
         path: String,
     },
-    /// Displays the rules, directory children, or the path to the sorting directory.
+    /// Displays the rules, directory children, sorting, or config directories.
     Display {
         #[arg(
             short,
@@ -90,6 +87,4 @@ enum Commands {
     },
     /// Save the current settings to a file.
     Save,
-    /// Load the settings from the application config directory.s
-    Load,
 }
