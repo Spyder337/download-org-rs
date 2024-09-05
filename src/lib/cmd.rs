@@ -41,7 +41,7 @@ pub(crate) fn execute(organizer: &mut Organizer) -> (){
             organizer.save_file();
         }
         Some(Commands::Save) => organizer.save_file(),
-        None => (),
+        None => println!("Usage: download-org.exe help"),
     }
 }
 
