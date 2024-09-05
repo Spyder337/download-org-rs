@@ -8,7 +8,8 @@ const FILE_NAME: &str = "dorg_config.json";
 pub(crate) struct Organizer{
     /// A rule is a (File Extension, Relative Path) Key Value pair.
     pub rules: BTreeMap<String, String>,
-    /// The destination folder that will be sorted.
+    /// The destination folder that will be sorted and 
+    /// combined with a Value from the [`Organizer::rules`].
     pub sorting_path: PathBuf,
 }
 
@@ -78,21 +79,6 @@ impl Organizer{
         rules
     }
 
-    pub fn update_rules(&mut self, base_dir: &PathBuf) -> () {
-
-        let mut new_rules: BTreeMap<String, String> = BTreeMap::new();
-
-        for rule in &self.rules {
-            let mut dest_path = PathBuf::from(base_dir);
-            let path = PathBuf::from(&rule.1);
-            let sub_dir = PathBuf::from(path.file_name().unwrap());
-            dest_path.push(sub_dir);
-            new_rules.insert(rule.0.clone(), os_str_to_string(dest_path.as_os_str()));
-        }
-
-        self.rules = new_rules;
-    }
-
     pub fn display_rules(&self) -> (){
         for r in &self.rules {
             println!("{} : {}", r.0, r.1)
@@ -113,8 +99,8 @@ impl Organizer{
     }
     
     pub(crate) fn get_downloaded_items(&self) -> Vec<String> {
-        let down_dir = PathBuf::from_str(self.sorting_path.to_str().unwrap()).unwrap();
-        let pattern = format!("{}/*.*", os_str_to_string(down_dir.as_os_str()));
+        let sort_dir = PathBuf::from_str(self.sorting_path.to_str().unwrap()).unwrap();
+        let pattern = format!("{}/*.*", os_str_to_string(sort_dir.as_os_str()));
         let mut items: Vec<String> = Vec::new();
         for entry in glob(&pattern).expect("Failed to read glob pattern"){
             match entry {
@@ -156,16 +142,23 @@ fn sort_items(paths: &[String], organizer: &Organizer, verbose: bool) {
                 println!("Moving : \"{}\"", os_str_to_string(path.as_os_str()));
             }
             let mut new_path = PathBuf::new();
+            //  Prepend the destination path root.
+            new_path.push(&organizer.sorting_path);
+            //  Append the relative folder path to the new path.
             new_path.push(organizer.rules[&ext].to_string());
-            new_path.push(file_name);
+            //  Contains the new full path including file name.
+            let mut new_file_path = PathBuf::new();
+            new_file_path.push(&new_path);
+            new_file_path.push(file_name);
             
             if verbose {
                 println!("Destinattion: \"{}\"", os_str_to_string(new_path.as_os_str()))
             }
-            if !fs::exists(organizer.rules[&ext].clone()).unwrap() {
-                let _ = fs::create_dir(PathBuf::from(organizer.rules[&ext].clone()));
+
+            if !fs::exists(&new_path).unwrap() {
+                let _ = fs::create_dir(&new_path);
             }
-            let _ = fs::rename(path.as_os_str(), new_path.as_os_str());
+            let _ = fs::rename(path.as_os_str(), new_file_path.as_os_str());
         }
     }
 }

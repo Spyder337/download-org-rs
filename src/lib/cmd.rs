@@ -18,7 +18,6 @@ pub(crate) fn execute(organizer: &mut Organizer) -> (){
         },
         Some(Commands::Assign { path }) => {
             let path_buf: PathBuf = PathBuf::from(&path);
-            organizer.update_rules(&PathBuf::from(&path_buf));
             organizer.sorting_path = PathBuf::from(path_buf);
             organizer.save_file()
         }
