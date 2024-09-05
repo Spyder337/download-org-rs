@@ -19,14 +19,14 @@ pub(crate) fn execute(organizer: &mut Organizer) -> (){
         Some(Commands::Assign { path }) => {
             let path_buf: PathBuf = PathBuf::from(&path);
             organizer.update_rules(&PathBuf::from(&path_buf));
-            organizer.downloads_path = PathBuf::from(path_buf);
+            organizer.sorting_path = PathBuf::from(path_buf);
             organizer.save_file()
         }
         Some(Commands::Display { mode }) => match mode {
             Some(m) => match m {
                 DisplayMode::Rules => organizer.display_rules(),
                 DisplayMode::Directory => organizer.display_directory(),
-                DisplayMode::RootDir => println!("{:?}", organizer.downloads_path),
+                DisplayMode::RootDir => println!("{:?}", organizer.sorting_path),
                 DisplayMode::ConfigDir => {
                     println!("{:?}", organizer::get_settings_folder().as_path())
                 }
@@ -35,7 +35,7 @@ pub(crate) fn execute(organizer: &mut Organizer) -> (){
         },
         Some(Commands::Add { extension, dest }) => {
             let mut dest_path = PathBuf::new();
-            dest_path.push(&organizer.downloads_path);
+            dest_path.push(&organizer.sorting_path);
             dest_path.push(dest);
             let filter: String = String::from(extension);
             organizer.rules.insert(filter, os_str_to_string(dest_path.as_os_str()));
@@ -78,12 +78,12 @@ enum Commands {
     /// Sorts the files in the sorting directory.
     Sort {
         /// Whether to output verbose messages.
-        #[arg(short = 'v', long)]
+        #[arg(short = 'v',)]
         verbose: Option<bool>,
     },
     /// Assign a new path as the sorting directory.
     Assign {
-        #[arg(short = 'a', long, help = "Assigns a new path to be sorted.")]
+        #[arg(short = 'a', help = "Assigns a new path to be sorted.")]
         path: String,
     },
     /// Displays the rules, directory children, sorting, or config directories.

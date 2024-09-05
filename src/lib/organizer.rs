@@ -6,13 +6,15 @@ const FILE_NAME: &str = "dorg_config.json";
 
 #[derive(Serialize, Deserialize)]
 pub(crate) struct Organizer{
+    /// A rule is a (File Extension, Relative Path) Key Value pair.
     pub rules: BTreeMap<String, String>,
-    pub downloads_path: PathBuf,
+    /// The destination folder that will be sorted.
+    pub sorting_path: PathBuf,
 }
 
 impl Default for Organizer {
     fn default() -> Self {
-        Self { rules: Organizer::get_default_rules(), downloads_path: get_downloads_folder() }
+        Self { rules: Organizer::get_default_rules(), sorting_path: get_downloads_folder() }
     } 
 }
 
@@ -20,7 +22,7 @@ impl Organizer{
 
     /// Creates a new [`Organizer`].
     pub fn new(rules: BTreeMap<String, String>) -> Self {
-        Self { rules, downloads_path: get_downloads_folder() }
+        Self { rules, sorting_path: get_downloads_folder() }
     }
 
     pub fn save_file(&self) -> () {
@@ -67,12 +69,9 @@ impl Organizer{
     
     pub fn get_default_rules() -> BTreeMap<String, String> {
         let mut rules: BTreeMap<String, String> = BTreeMap::new();
-        let download_root = get_downloads_folder();
         let mut exe_path = PathBuf::new();
-        exe_path.push(&download_root);
         exe_path.push("Executables");
         let mut meta_path = PathBuf::new();
-        meta_path.push(&download_root);
         meta_path.push("MetaInfo");
         rules.insert("exe".to_string(), os_str_to_string(exe_path.as_os_str()));
         rules.insert("torrent".to_string(), os_str_to_string(meta_path.as_os_str()));
@@ -114,7 +113,7 @@ impl Organizer{
     }
     
     pub(crate) fn get_downloaded_items(&self) -> Vec<String> {
-        let down_dir = PathBuf::from_str(self.downloads_path.to_str().unwrap()).unwrap();
+        let down_dir = PathBuf::from_str(self.sorting_path.to_str().unwrap()).unwrap();
         let pattern = format!("{}/*.*", os_str_to_string(down_dir.as_os_str()));
         let mut items: Vec<String> = Vec::new();
         for entry in glob(&pattern).expect("Failed to read glob pattern"){
@@ -127,7 +126,7 @@ impl Organizer{
     }
     
     fn get_downloads_sub_dirs(&self) -> Vec<String> {
-        let down_dir = PathBuf::from(&self.downloads_path);
+        let down_dir = PathBuf::from(&self.sorting_path);
         let pattern = format!("{}/**/",os_str_to_string(down_dir.as_os_str()));
         let mut dirs: Vec<String> = Vec::new();
         for entry in glob(&pattern).expect("Failed to read glob pattern.") {
