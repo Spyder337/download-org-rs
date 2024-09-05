@@ -2,6 +2,8 @@ use std::{path::PathBuf, str::FromStr};
 
 use clap::{command, Parser, Subcommand, ValueEnum};
 
+use crate::lib::organizer::os_str_to_string;
+
 use super::organizer::{self, Organizer};
 
 pub(crate) fn execute(organizer: &mut Organizer) -> (){
@@ -31,6 +33,14 @@ pub(crate) fn execute(organizer: &mut Organizer) -> (){
             },
             None => organizer.display_rules(),
         },
+        Some(Commands::Add { extension, dest }) => {
+            let mut dest_path = PathBuf::new();
+            dest_path.push(&organizer.downloads_path);
+            dest_path.push(dest);
+            let filter: String = String::from(extension);
+            organizer.rules.insert(filter, os_str_to_string(dest_path.as_os_str()));
+            organizer.save_file();
+        }
         Some(Commands::Save) => organizer.save_file(),
         None => (),
     }
@@ -71,7 +81,7 @@ enum Commands {
         #[arg(short = 'v', long)]
         verbose: Option<bool>,
     },
-    /// Assign a new path as the sorting directory.s
+    /// Assign a new path as the sorting directory.
     Assign {
         #[arg(short = 'a', long, help = "Assigns a new path to be sorted.")]
         path: String,
@@ -84,6 +94,13 @@ enum Commands {
             help = "Displays the rules or content of the directory to be sorted."
         )]
         mode: Option<DisplayMode>,
+    },
+    /// Adds a rule to the current list of rules
+    Add {
+        #[arg(short, help = "The file extension to be filtered.")]
+        extension: String,
+        #[arg(short, help = "The destination relative to the sorting directory.")]
+        dest: String,
     },
     /// Save the current settings to a file.
     Save,

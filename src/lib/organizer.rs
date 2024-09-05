@@ -51,10 +51,6 @@ impl Organizer{
         }
     }
 
-    pub fn load(&mut self) -> (){
-        
-    }
-
     pub fn from_file(path: &PathBuf) -> Self {
         if !fs::exists(path).unwrap() {
             panic!("File was not found.")
