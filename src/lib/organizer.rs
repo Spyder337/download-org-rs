@@ -168,7 +168,8 @@ impl Organizer {
 
     pub(self) fn glob_remove(pattern: String) -> usize {
         let mut remove_cnt: usize = 0;
-        for entry in glob(&pattern).expect("") {
+        let glob_results = glob(&pattern).expect("Could not parse pattern.");
+        for entry in glob_results {
             match entry {
                 Ok(path) => {
                     remove_cnt += 1;

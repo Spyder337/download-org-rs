@@ -68,10 +68,10 @@ enum DisplayMode {
 impl ToString for DisplayMode {
     fn to_string(&self) -> String {
         match &self {
-            DisplayMode::Rules => String::from_str("Rules").unwrap(),
-            DisplayMode::Directory => String::from_str("Directory").unwrap(),
-            DisplayMode::RootDir => String::from_str("Root Directory").unwrap(),
-            DisplayMode::ConfigDir => String::from_str("Config Directory").unwrap(),
+            DisplayMode::Rules => String::from_str("rules").unwrap(),
+            DisplayMode::Directory => String::from_str("directory").unwrap(),
+            DisplayMode::RootDir => String::from_str("root-dir").unwrap(),
+            DisplayMode::ConfigDir => String::from_str("config-dir").unwrap(),
         }
     }
 }
@@ -90,9 +90,9 @@ pub(crate) enum CleaningMode {
 impl ToString for CleaningMode {
     fn to_string(&self) -> String {
         match &self {
-            CleaningMode::Extension => String::from_str("Extension").unwrap(),
-            CleaningMode::Directory => String::from_str("Directory").unwrap(),
-            CleaningMode::RootDir => String::from_str("Root Directory").unwrap(),
+            CleaningMode::Extension => String::from_str("extension").unwrap(),
+            CleaningMode::Directory => String::from_str("directory").unwrap(),
+            CleaningMode::RootDir => String::from_str("root-dir").unwrap(),
         }
     }
 }
@@ -130,12 +130,13 @@ enum Commands {
         #[arg(short, help = "The destination relative to the sorting directory.")]
         dest: String,
     },
+    /// Deletes items in the directory tree.
     Clean {
         #[arg(short, help = "Determines which files are deleted.", 
             default_value_t = CleaningMode::Extension)]
         mode: CleaningMode,
         #[arg(short,
-            default_value_t=String::from_str(".exe").unwrap())]
+            default_value_t=String::from_str("exe").unwrap())]
         /// Required input for [`CleaningMode::Extension`] and [`CleaningMode::Directory`].
         in_str: String
     }
