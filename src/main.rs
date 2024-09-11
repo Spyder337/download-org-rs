@@ -2,9 +2,7 @@
 mod cmd;
 mod organizer;
 
-
 use crate::organizer::Organizer;
-
 
 #[allow(unused_assignments)]
 fn main() {

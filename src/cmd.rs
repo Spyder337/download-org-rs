@@ -40,11 +40,11 @@ pub(crate) fn execute(organizer: &mut Organizer) {
                 .rules
                 .insert(filter, os_str_to_string(dest_path.as_os_str()));
             organizer.save_file();
-        },
+        }
         Some(Commands::Clean { mode, in_str }) => {
             let removed_cnt: usize = organizer.run_clean(mode, in_str);
             println!("Deleted {} items.", removed_cnt);
-        },
+        }
         None => println!("Usage: download-org.exe help"),
     }
 }
@@ -138,6 +138,6 @@ enum Commands {
         #[arg(short,
             default_value_t=String::from_str("exe").unwrap())]
         /// Required input for [`CleaningMode::Extension`] and [`CleaningMode::Directory`].
-        in_str: String
-    }
+        in_str: String,
+    },
 }

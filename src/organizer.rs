@@ -98,26 +98,30 @@ impl Organizer {
 
     pub fn run_clean(&self, mode: &CleaningMode, in_str: &String) -> usize {
         let remove_cnt: usize;
-        
+
         match &mode {
             CleaningMode::Extension => {
                 let base_path = PathBuf::from(&self.sorting_path);
-                let pattern = format!("{}/**/*.{}", os_str_to_string(base_path.as_os_str()), in_str);
+                let pattern = format!(
+                    "{}/**/*.{}",
+                    os_str_to_string(base_path.as_os_str()),
+                    in_str
+                );
                 remove_cnt = Self::glob_remove(pattern);
-            },
+            }
             CleaningMode::Directory => {
                 let mut base_path = PathBuf::from(&self.sorting_path);
                 base_path.push(in_str);
                 let pattern = format!("{}/**/*.*", os_str_to_string(base_path.as_os_str()));
                 remove_cnt = Self::glob_remove(pattern);
-            },
+            }
             CleaningMode::RootDir => {
                 let base_path = PathBuf::from(&self.sorting_path);
                 let pattern = format!("{}/**/*.*", os_str_to_string(base_path.as_os_str()));
                 remove_cnt = Self::glob_remove(pattern);
-            },
+            }
         }
-    
+
         remove_cnt
     }
 
@@ -171,7 +175,7 @@ impl Organizer {
                 Ok(path) => {
                     remove_cnt += 1;
                     fs::remove_file(path).unwrap();
-                },
+                }
                 Err(e) => println!("Could not read the path. Error\n{:?}", e),
             }
         }
@@ -249,4 +253,3 @@ pub(crate) fn load_organizer() -> Organizer {
     }
     organizer
 }
-
