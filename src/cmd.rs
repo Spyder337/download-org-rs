@@ -11,9 +11,9 @@ pub(crate) fn execute(organizer: &mut Organizer) {
     match &cli.command {
         Some(Commands::Sort { verbose }) => match verbose {
             Some(v) => {
-                organizer::sort_downloads(organizer, *v);
+                organizer::run_sort(organizer, *v);
             }
-            None => organizer::sort_downloads(organizer, false),
+            None => organizer::run_sort(organizer, false),
         },
         Some(Commands::Assign { path }) => {
             let path_buf: PathBuf = PathBuf::from(&path);

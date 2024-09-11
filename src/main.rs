@@ -1,10 +1,13 @@
 #![allow(dead_code)]
-use lib::organizer::{self, Organizer};
+mod cmd;
+mod organizer;
 
-mod lib;
+
+use crate::organizer::Organizer;
+
 
 #[allow(unused_assignments)]
 fn main() {
     let mut organizer: Organizer = organizer::load_organizer();
-    lib::cmd::execute(&mut organizer);
+    crate::cmd::execute(&mut organizer);
 }

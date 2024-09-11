@@ -5,7 +5,7 @@ use std::{
     ffi::OsStr,
     fs::{self},
     path::{Path, PathBuf},
-    str::{FromStr},
+    str::FromStr,
 };
 
 use super::cmd::CleaningMode;
@@ -96,51 +96,6 @@ impl Organizer {
         rules
     }
 
-    pub fn display_rules(&self) {
-        for r in &self.rules {
-            println!("{} : {}", r.0, r.1)
-        }
-    }
-
-    pub fn display_directory(&self) {
-        let items = self.get_downloaded_items();
-        let dirs = self.get_downloads_sub_dirs();
-        println!("Directories: ");
-        for i in dirs {
-            println!("{}", i);
-        }
-        println!("Files: ");
-        for i in items {
-            println!("{}", i);
-        }
-    }
-
-    pub(crate) fn get_downloaded_items(&self) -> Vec<String> {
-        let sort_dir = PathBuf::from_str(self.sorting_path.to_str().unwrap()).unwrap();
-        let pattern = format!("{}/*.*", os_str_to_string(sort_dir.as_os_str()));
-        let mut items: Vec<String> = Vec::new();
-        for entry in glob(&pattern).expect("Failed to read glob pattern") {
-            match entry {
-                Ok(path) => items.push(os_str_to_string(path.as_os_str())),
-                Err(e) => println!("{:?}", e),
-            }
-        }
-        items
-    }
-
-    fn get_downloads_sub_dirs(&self) -> Vec<String> {
-        let down_dir = PathBuf::from(&self.sorting_path);
-        let pattern = format!("{}/**/", os_str_to_string(down_dir.as_os_str()));
-        let mut dirs: Vec<String> = Vec::new();
-        for entry in glob(&pattern).expect("Failed to read glob pattern.") {
-            match entry {
-                Ok(path) => dirs.push(os_str_to_string(path.as_os_str())),
-                Err(e) => println!("{:?}", e),
-            }
-        }
-        dirs
-    }
-
     pub fn run_clean(&self, mode: &CleaningMode, in_str: &String) -> usize {
         let remove_cnt: usize;
         
@@ -166,6 +121,48 @@ impl Organizer {
         remove_cnt
     }
 
+    pub fn display_rules(&self) {
+        for r in &self.rules {
+            println!("{} : {}", r.0, r.1)
+        }
+    }
+
+    pub fn display_directory(&self) {
+        let items = self.get_children();
+        let dirs = self.get_child_sub_dirs();
+        println!("Directories: ");
+        for i in dirs {
+            println!("{}", i);
+        }
+        println!("Files: ");
+        for i in items {
+            println!("{}", i);
+        }
+    }
+
+    pub fn get_children(&self) -> Vec<String> {
+        let sort_dir = PathBuf::from_str(self.sorting_path.to_str().unwrap()).unwrap();
+        let pattern = format!("{}/*.*", os_str_to_string(sort_dir.as_os_str()));
+        Organizer::glob_results(pattern)
+    }
+
+    pub fn get_child_sub_dirs(&self) -> Vec<String> {
+        let down_dir = PathBuf::from(&self.sorting_path);
+        let pattern = format!("{}/**/", os_str_to_string(down_dir.as_os_str()));
+        Organizer::glob_results(pattern)
+    }
+
+    pub(self) fn glob_results(pattern: String) -> Vec<String> {
+        let mut items: Vec<String> = Vec::new();
+        for entry in glob(&pattern).expect("Failed to read glob pattern") {
+            match entry {
+                Ok(path) => items.push(os_str_to_string(path.as_os_str())),
+                Err(e) => println!("{:?}", e),
+            }
+        }
+        items
+    }
+
     pub(self) fn glob_remove(pattern: String) -> usize {
         let mut remove_cnt: usize = 0;
         let glob_results = glob(&pattern).expect("Could not parse pattern.");
@@ -182,8 +179,8 @@ impl Organizer {
     }
 }
 
-pub(crate) fn sort_downloads(organizer: &Organizer, verbose: bool) {
-    let items: Vec<String> = organizer.get_downloaded_items();
+pub(crate) fn run_sort(organizer: &Organizer, verbose: bool) {
+    let items: Vec<String> = organizer.get_children();
     sort_items(&items, organizer, verbose);
 }
 
